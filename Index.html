@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversor de Pesos Argentinos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky:     #0A84C8;
+      --sky-lt:  #C8E8FA;
+      --sun:     #F5C400;
+      --sun-lt:  #FFF6CC;
+      --gtq:     #1E8A5C;
+      --gtq-lt:  #D2F0E4;
+      --bg:      #F0F6FC;
+      --surface: #FFFFFF;
+      --ink:     #0D1B2A;
+      --muted:   #6B7E90;
+      --border:  #D3E4F0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      color: var(--ink);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(10,132,200,.12), 0 2px 8px rgba(0,0,0,.06);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    /* ── HEADER BANNER ── */
+    .banner {
+      background: linear-gradient(135deg, #0059A8 0%, #0A84C8 60%, #40B3EC 100%);
+      padding: 2.4rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .banner::before {
+      content: '';
+      position: absolute;
+      width: 260px; height: 260px;
+      background: rgba(255,255,255,.07);
+      border-radius: 50%;
+      top: -80px; right: -60px;
+    }
+    .banner::after {
+      content: '';
+      position: absolute;
+      width: 140px; height: 140px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+      bottom: -50px; left: 30px;
+    }
+    .banner-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      margin-bottom: .5rem;
+    }
+    .banner-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+      position: relative;
+      z-index: 1;
+    }
+    .banner-title span {
+      color: var(--sun);
+    }
+    .banner-sub {
+      margin-top: .5rem;
+      font-size: .82rem;
+      color: rgba(255,255,255,.65);
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── BODY ── */
+    .body {
+      padding: 2rem;
+    }
+
+    /* ── INPUT GROUP ── */
+    .input-label {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .5rem;
+      display: block;
+    }
+    .input-wrap {
+      position: relative;
+      margin-bottom: 1.6rem;
+    }
+    .currency-flag {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: .9rem 1rem .9rem 3rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      border-color: var(--sky);
+      box-shadow: 0 0 0 4px rgba(10,132,200,.12);
+    }
+    input[type="number"]::placeholder {
+      color: #b0c4d4;
+      font-weight: 400;
+      font-size: 1.1rem;
+    }
+
+    /* ── DIVIDER ARROW ── */
+    .arrow {
+      text-align: center;
+      margin: -.2rem 0 1.2rem;
+      font-size: 1.3rem;
+      color: var(--sky);
+      opacity: .5;
+    }
+
+    /* ── RESULT CARDS ── */
+    .results {
+      display: grid;
+      gap: 1rem;
+    }
+    .result-card {
+      border-radius: 16px;
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform .15s;
+    }
+    .result-card:hover { transform: translateY(-2px); }
+
+    .result-card.gtq {
+      background: var(--gtq-lt);
+      border: 1.5px solid #A8DFC8;
+    }
+    .result-card.usd {
+      background: var(--sun-lt);
+      border: 1.5px solid #F0DC80;
+    }
+
+    .result-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .result-card.gtq .result-icon { background: #fff; }
+    .result-card.usd .result-icon { background: #fff; }
+
+    .result-meta { flex: 1; }
+    .result-label {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .15rem;
+    }
+    .result-card.gtq .result-label { color: var(--gtq); }
+    .result-card.usd .result-label { color: #A08000; }
+
+    .result-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .result-amount .symbol {
+      font-size: 1rem;
+      font-weight: 600;
+      opacity: .6;
+      margin-right: .2em;
+    }
+    .result-amount.empty {
+      color: #c0ced8;
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+
+    /* ── RATE FOOTER ── */
+    .rates-footer {
+      margin-top: 1.8rem;
+      padding-top: 1.2rem;
+      border-top: 1.5px solid var(--border);
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .rate-pill {
+      font-size: .72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+    }
+    .rate-pill strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot.green { background: var(--gtq); }
+    .dot.yellow { background: #C8A000; }
+
+    /* ── RESET BUTTON ── */
+    .btn-reset {
+      display: block;
+      width: 100%;
+      margin-top: 1.4rem;
+      padding: .75rem;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .btn-reset:hover {
+      background: var(--bg);
+      color: var(--sky);
+      border-color: var(--sky);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 500px) {
+      .banner-title { font-size: 1.55rem; }
+      .result-amount { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="banner">
+    <p class="banner-eyebrow">Conversor de divisas</p>
+    <h1 class="banner-title">Pesos<br><span>Argentinos</span></h1>
+    <p class="banner-sub">Ingresá el monto y obtené la conversión al instante</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <label class="input-label" for="pesos">Monto en pesos argentinos (ARS)</label>
+    <div class="input-wrap">
+      <span class="currency-flag">🇦🇷</span>
+      <input
+        id="pesos"
+        type="number"
+        min="0"
+        placeholder="Ej. 38000"
+        oninput="convertir(this.value)"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- RESULTADOS -->
+    <div class="results">
+
+      <!-- GTQ -->
+      <div class="result-card gtq">
+        <div class="result-icon">🇬🇹</div>
+        <div class="result-meta">
+          <div class="result-label">Quetzales guatemaltecos · GTQ</div>
+          <div class="result-amount" id="res-gtq">
+            <span class="empty">Ingresá un monto</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- USD -->
+      <div class="result-card usd">
+        <div class="result-icon">🇺🇸</div>
+        <div class="result-meta">
+          <div class="result-label">Dólares estadounidenses · USD</div>
+          <div class="result-amount" id="res-usd">
+            <span class="empty">Ingresá un monto</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TASAS DE REFERENCIA -->
+    <div class="rates-footer">
+      <span class="rate-pill">
+        <span class="dot green"></span>
+        ARS 38.000 = <strong>Q 217,45</strong>
+      </span>
+      <span class="rate-pill">
+        <span class="dot yellow"></span>
+        ARS 38.000 = <strong>USD 27,18</strong>
+      </span>
+    </div>
+
+    <button class="btn-reset" onclick="resetear()">↺ Limpiar</button>
+
+  </div>
+</div>
+
+<script>
+  // Tasas de referencia
+  const ARS_BASE   = 38000;
+  const GTQ_BASE   = 217.4478845;
+  const USD_BASE   = 27.18098556;
+
+  const GTQ_POR_ARS = GTQ_BASE / ARS_BASE;
+  const USD_POR_ARS = USD_BASE / ARS_BASE;
+
+  function fmt(num, decimals) {
+    return num.toLocaleString('es-AR', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  function convertir(val) {
+    const pesos = parseFloat(val);
+    const elGtq = document.getElementById('res-gtq');
+    const elUsd = document.getElementById('res-usd');
+
+    if (!val || isNaN(pesos) || pesos < 0) {
+      elGtq.innerHTML = '<span class="empty">Ingresá un monto</span>';
+      elUsd.innerHTML = '<span class="empty">Ingresá un monto</span>';
+      return;
+    }
+
+    const gtq = pesos * GTQ_POR_ARS;
+    const usd = pesos * USD_POR_ARS;
+
+    elGtq.innerHTML = `<span class="symbol">Q</span>${fmt(gtq, 2)}`;
+    elUsd.innerHTML = `<span class="symbol">$</span>${fmt(usd, 2)}`;
+  }
+
+  function resetear() {
+    document.getElementById('pesos').value = '';
+    document.getElementById('res-gtq').innerHTML = '<span class="empty">Ingresá un monto</span>';
+    document.getElementById('res-usd').innerHTML = '<span class="empty">Ingresá un monto</span>';
+    document.getElementById('pesos').focus();
+  }
+</script>
+
+</body>
+</html>
